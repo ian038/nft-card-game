@@ -4,7 +4,8 @@ import { CustomButton, CustomInput, PageHOC } from "../components";
 import { useGlobalContext } from "../context";
 
 const Home = () => {
-  const { contract, walletAddress } = useGlobalContext();
+  const { contract, walletAddress, gameData, setShowAlert, setErrorMessage } =
+    useGlobalContext();
   const [playerName, setPlayerName] = useState<string>("");
   const navigate = useNavigate();
 
@@ -17,17 +18,16 @@ const Home = () => {
           gasLimit: 500000,
         });
 
-        // setShowAlert({
-        //   status: true,
-        //   type: 'info',
-        //   message: `${playerName} is being summoned!`,
-        // });
+        setShowAlert({
+          status: true,
+          type: "info",
+          message: `${playerName} is being summoned!`,
+        });
 
         setTimeout(() => navigate("/create-battle"), 8000);
       }
     } catch (error) {
-      // setErrorMessage(error);
-      console.log(error);
+      setErrorMessage(error);
     }
   };
 
@@ -42,27 +42,29 @@ const Home = () => {
     if (contract) createPlayerToken();
   }, [contract]);
 
-  // useEffect(() => {
-  //   if (gameData.activeBattle) {
-  //     navigate(`/battle/${gameData.activeBattle.name}`);
-  //   }
-  // }, [gameData]);
+  useEffect(() => {
+    if (gameData.activeBattle) {
+      navigate(`/battle/${gameData.activeBattle.name}`);
+    }
+  }, [gameData]);
 
   return (
-    <div className="flex flex-col">
-      <CustomInput
-        label="Name"
-        placeHolder="Enter your player name"
-        value={playerName}
-        handleValueChange={setPlayerName}
-      />
+    walletAddress && (
+      <div className="flex flex-col">
+        <CustomInput
+          label="Name"
+          placeHolder="Enter your player name"
+          value={playerName}
+          handleValueChange={setPlayerName}
+        />
 
-      <CustomButton
-        title="Register"
-        handleClick={handleClick}
-        restStyles="mt-6"
-      />
-    </div>
+        <CustomButton
+          title="Register"
+          handleClick={handleClick}
+          restStyles="mt-6"
+        />
+      </div>
+    )
   );
 };
 
